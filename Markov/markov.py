@@ -34,7 +34,6 @@ class Markov:
             pass_chains = pass_chains.append(pd.read_excel(os.path.join(source_file, file)))
         return pass_chains
 
-
     def passchain2matrix(self, pass_chain, state_list):
         """
         :param pass_chain: pd.DataFrame 原始采集数据
