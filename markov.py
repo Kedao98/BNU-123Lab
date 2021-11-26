@@ -7,8 +7,7 @@ class Markov:
 
     def __init__(self, state_list, source_file):
         self.state_list = state_list
-        self.source_file = source_file
-        self.origin_matrix = self.passchain2matrix(pd.read_excel(source_file), state_list)
+        self.origin_matrix = self.passchain2matrix(self.load_passchain(source_file), state_list)
         self.pass_prob_matrix = self.calc_prob_matrix(self.origin_matrix)
         self.tc0 = self.predict(self.pass_prob_matrix)
         self.res_list = None
@@ -23,6 +22,18 @@ class Markov:
             for j in range(i, shape[0]):
                 self.res_list[i][j] = (self.predict(self.deflect(self.origin_matrix[:], (i, j))) - self.tc0) * 100
         return self.res_list
+
+    def load_passchain(self, source_file):
+        if '.' in os.path.split(source_file)[-1]:# 某个文件
+            return pd.read_excel(source_file)
+
+        pass_chains = pd.DataFrame()
+        for file in os.listdir(source_file):
+            if file == '.DS_Store':
+                continue
+            pass_chains = pass_chains.append(pd.read_excel(os.path.join(source_file, file)))
+        return pass_chains
+
 
     def passchain2matrix(self, pass_chain, state_list):
         """
@@ -88,7 +99,7 @@ class Markov:
 
 
 if __name__ == '__main__':
-    source_file = './data/test.xls'
+    source_file = './data'
     state_list = ['RDM', 'ROM', 'RA', 'ZOM', 'LDM', 'ZS', 'RS', 'ZDM',
                   'LOM', 'LS', 'ZA', 'LA', 'NTC', 'TC']
     model = Markov(state_list, source_file)
